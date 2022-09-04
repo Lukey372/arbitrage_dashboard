@@ -22,7 +22,7 @@ interface Trade {
 }
 
 function App() {
-  const [page, setPage] = useState('calculator')
+  const [page, setPage] = useState('page')
   function pageSwitch() {
     page == "calculator" ? setPage('page') : setPage('calculator')
 }

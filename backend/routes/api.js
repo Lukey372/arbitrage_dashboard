@@ -137,11 +137,13 @@ const trades = [{
 }]
 
 router.get('/trades', async (req, res) => {
-  let documents = await mongoClient.db("arbitrage").collection("trades").find({}).toArray();
+  let toTimestamp = Date.now();
+  let fromTimestamp = toTimestamp - 1 * 86400 * 1000;
+  let documents = await mongoClient.db("arbitrage").collection("trades").find({ "executionReport.eventTime": { $gte: fromTimestamp } }).toArray();
   let trades = documents.map(trade => formatTrade(trade));
-  res.json({ trades })
+  res.json({ trades });
 })
-
+let sum = 0
 
 
 module.exports = router;
@@ -157,7 +159,7 @@ function formatTrade(trade) {
     let amountOut = new Decimal(value).dividedBy(10 ** 18)
     let amountIn = lastQuoteTransacted
     let profit = side == 'SELL' ? amountWithCommission(amountIn, commissionAsset, side).minus(amountOut) : amountOut.minus(amountWithCommission(amountIn, commissionAsset, side));
-
+    sum = sum + Number(profit)
 
     return {
       orderId,
@@ -177,7 +179,7 @@ function formatTrade(trade) {
       transactionHash,
       status,
     }
-  }else{
+  } else {
     return {
       orderId,
       tradeId,
@@ -190,9 +192,9 @@ function formatTrade(trade) {
       commissionAsset,
       effectiveGasPrice,
       gasUsed,
-      amountIn:null,
-      amountOut:null,
-      profit:null,
+      amountIn: null,
+      amountOut: null,
+      profit: null,
       transactionHash,
       status,
     }
