@@ -139,11 +139,6 @@ const trades = [{
 router.get('/trades', async (req, res) => {
   let documents = await mongoClient.db("arbitrage").collection("trades").find({}).toArray();
   let trades = documents.map(trade => formatTrade(trade));
-  let profits = trades.map(trade => trade.profit);
-  const sum = profits.reduce(
-    (previousValue, currentValue) => new Decimal(previousValue).plus(currentValue)
-  );
-  console.log(sum)
   res.json({ trades })
 })
 
@@ -153,30 +148,54 @@ module.exports = router;
 
 function formatTrade(trade) {
   const { executionReport, transactionReceipt } = trade
-  const { side, symbol, eventTime, lastTradeQuantity, lastQuoteTransacted, price, commission, commissionAsset, tradeId ,orderId} = executionReport
-  const { logs, effectiveGasPrice, gasUsed } = transactionReceipt
-  let test = (log) => log.topics[side == 'SELL' ? 1 : 2] == '0x000000000000000000000000348444251e666cacbba54268245e5dfabb4c66ee'
-  let transferLog = logs.find(test)
-  let value = ABICoder.decodeParameter("uint256", transferLog.data);
-  let amountOut = new Decimal(value).dividedBy(10 ** 18)
-  let amountIn = lastQuoteTransacted
-  let profit = side == 'SELL' ? amountWithCommission(amountIn, commissionAsset, side).minus(amountOut) : amountOut.minus(amountWithCommission(amountIn, commissionAsset, side));
+  const { side, symbol, eventTime, lastTradeQuantity, lastQuoteTransacted, price, commission, commissionAsset, tradeId, orderId } = executionReport
+  const { logs, effectiveGasPrice, gasUsed, transactionHash, status } = transactionReceipt
+  if (status) {
+    let test = (log) => log.topics[side == 'SELL' ? 1 : 2] == '0x000000000000000000000000348444251e666cacbba54268245e5dfabb4c66ee'
+    let transferLog = logs.find(test)
+    let value = ABICoder.decodeParameter("uint256", transferLog.data);
+    let amountOut = new Decimal(value).dividedBy(10 ** 18)
+    let amountIn = lastQuoteTransacted
+    let profit = side == 'SELL' ? amountWithCommission(amountIn, commissionAsset, side).minus(amountOut) : amountOut.minus(amountWithCommission(amountIn, commissionAsset, side));
 
-  return {
-    orderId,
-    tradeId,
-    side,
-    symbol,
-    eventTime,
-    lastTradeQuantity,
-    price,
-    commission,
-    commissionAsset,
-    effectiveGasPrice,
-    gasUsed,
-    amountIn,
-    amountOut,
-    profit
+
+    return {
+      orderId,
+      tradeId,
+      side,
+      symbol,
+      eventTime,
+      lastTradeQuantity,
+      price,
+      commission,
+      commissionAsset,
+      effectiveGasPrice,
+      gasUsed,
+      amountIn,
+      amountOut,
+      profit,
+      transactionHash,
+      status,
+    }
+  }else{
+    return {
+      orderId,
+      tradeId,
+      side,
+      symbol,
+      eventTime,
+      lastTradeQuantity,
+      price,
+      commission,
+      commissionAsset,
+      effectiveGasPrice,
+      gasUsed,
+      amountIn:null,
+      amountOut:null,
+      profit:null,
+      transactionHash,
+      status,
+    }
   }
 
 }

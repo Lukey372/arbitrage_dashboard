@@ -3,6 +3,7 @@ import Table from './components/Table/index';
 import Calculator from './components/Calculator';
 import Layout from './skeleton/Layout';
 import {Button} from '@chakra-ui/react';
+import Home from './components/Homepage/Home';
 
 interface Trade {
   tradeId: string
@@ -28,7 +29,7 @@ function App() {
   
   return (
 <Layout>
-      {page == "calculator" ? <Calculator /> :
+      {page == "calculator" ? <Home /> :
     <Table/>
       }
       <Button onClick={pageSwitch}>{page == "calculator" ? "Page" : "Calculator"}</Button>
