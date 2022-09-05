@@ -54,6 +54,7 @@ function ListOfTrades() {
     const [pageData, setPageData] = useState<Trade[]>([]);
     const [currency, setCurrency] = useState('(ETH)-USD')
     const [ethereumPrice, setEthereumPrice] = useState(0)
+    const [apiRequest, setApiRequest] = useState("http://127.0.0.1:5000/api/trades")
     const nextPage = () => setPage(prev => prev + 1)
     const prevPage = () => setPage(prev => prev > 0 ? prev - 1 : prev)
     const explorerLink = `https://explorer.roninchain.com/tx/`
@@ -62,7 +63,6 @@ function ListOfTrades() {
             let response = await fetch(apiLink);
             let responseJson = await response.json()
             setEthereumPrice(responseJson[0].current_price)
-            console.log(responseJson[0].current_price)
         };
         ethPrice()
     })
@@ -79,23 +79,26 @@ function ListOfTrades() {
     useEffect(() => {
 
         (async () => {
+            if (apiRequest != "http://127.0.0.1:5000/api/trades") {
+                var response = await fetch(apiRequest);
 
-            var response = await fetch("http://127.0.0.1:5000/api/trades");
+                var responseJson = await response.json();
 
-            var responseJson = await response.json();
+                console.log(responseJson.trades);
 
-            console.log(responseJson.trades);
-
-            setTrades([...responseJson.trades])
+                setTrades([...responseJson.trades])
+            } else {
+                console.log(apiRequest + ' error')
+            }
 
         })()
 
-    }, [])
+    }, [apiRequest])
 
 
     return (
         <Stack>
-            <DateInput start='' end=''/>
+            <DateInput apiRequest={apiRequest} setApiRequest={setApiRequest} setPage={setPage} />
             <Center w='100%' h="100vh" verticalAlign="baseline" >
                 <TableContainer bg='white' opacity='0.9' borderRadius='2%' w='auto'>
                     <Table>
@@ -140,9 +143,9 @@ function ListOfTrades() {
 
                                     <Tr _hover={{ bg: "gray.100" }}>
                                         {/*<Link  _hover={{ textDecoration: 'none' }} href={explorerLink+trade.transactionHash} isExternal> */}
-                                        <Td color = {(trade.status)?"green":"red"}>
-                                            {(trade.status)?"Success":"Failure"}
-                                        </Td>                             
+                                        <Td color={(trade.status) ? "green" : "red"}>
+                                            {(trade.status) ? "Success" : "Failure"}
+                                        </Td>
                                         <Td >
                                             {trade.orderId}
                                         </Td>
@@ -182,7 +185,7 @@ function ListOfTrades() {
             <HStack>
                 <Button onClick={prevPage} isDisabled={page == 0 ? true : false}>Previous</Button>
 
-                <Button onClick={nextPage} isDisabled={(page + 1 == Math.ceil(trades.length / pageSize)) && (Math.ceil(trades.length / pageSize) > 1) ? true : false}> Next</Button>
+                <Button onClick={nextPage} isDisabled={(page + 1 == Math.ceil(trades.length / pageSize)) && (Math.ceil(trades.length / pageSize) >= 1) ? true : false}> Next</Button>
             </HStack>
         </Stack>
     )
