@@ -11,9 +11,12 @@ import {
     Center,
     Button,
     HStack,
-    Link
+    Link,
+    Input,
 } from '@chakra-ui/react';
+import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import DateInput from './dateInput';
+import format from 'date-fns/format';
 
 interface Trade {
     tradeId: string
@@ -47,6 +50,7 @@ function timeConverter(UNIX_timestamp: number) {
     var time = `${date}-${month} | ${hour}:${min}`;
     return time;
 }
+
 function ListOfTrades() {
     const pageSize = 10;
     const [trades, setTrades] = useState<Trade[]>([]);
@@ -88,7 +92,12 @@ function ListOfTrades() {
 
                 setTrades([...responseJson.trades])
             } else {
-                console.log(apiRequest + ' error')
+                console.log(apiRequest + ' error');
+                let today = format(( d => new Date(d.setDate(d.getDate()+1)) )(new Date),'yyyy-L-d');
+                let yesterday = format(( d => new Date(d.setDate(d.getDate()-1)) )(new Date),'yyyy-L-d');
+                let defaultApiRequest = `${apiRequest}?period=${yesterday},${today}`
+                setApiRequest(defaultApiRequest)
+                console.log(apiRequest)
             }
 
         })()
@@ -183,9 +192,9 @@ function ListOfTrades() {
                 </TableContainer>
             </Center>
             <HStack>
-                <Button onClick={prevPage} isDisabled={page == 0 ? true : false}>Previous</Button>
-
-                <Button onClick={nextPage} isDisabled={(page + 1 == Math.ceil(trades.length / pageSize)) && (Math.ceil(trades.length / pageSize) >= 1) ? true : false}> Next</Button>
+                <Button onClick={prevPage} isDisabled={page == 0 ? true : false}><ArrowLeftIcon color="#277BC0" /></Button>
+                <Input fontSize="1xl" textAlign='center' value={page+1+'/'+Math.ceil(trades.length / pageSize)} maxW='5rem' bg="white" placeholder='1' />
+                <Button onClick={nextPage} isDisabled={(page + 1 == Math.ceil(trades.length / pageSize)) && (Math.ceil(trades.length / pageSize) >= 1) ? true : false}><ArrowRightIcon color="#277BC0" /></Button>
             </HStack>
         </Stack>
     )
