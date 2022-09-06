@@ -1,19 +1,21 @@
 const { Router } = require('express');
 const ABICoder = require("web3-eth-abi");
 const Decimal = require('decimal.js');
+
 const { mongoClient } = require('../constants');
-const { parse, isValid, startOfDay, endOfDay } = require('date-fns');
 const router = Router();
 
+
 router.get('/trades', async (req, res) => {
-  const { period } = req.query;
-  let [fromTimestamp, toTimestamp] = getPeriodTimestampRange(period);
+  let [fromTimestamp, toTimestamp] = getPeriodTimestampRange(req);
   let documents = await mongoClient.db("arbitrage").collection("trades").find({ "executionReport.eventTime": { $gte: fromTimestamp, $lte: toTimestamp } }).toArray();
   let trades = documents.map(trade => formatTrade(trade));
   res.json({ trades });
 });
 
 module.exports = router;
+
+
 
 function formatTrade(trade) {
   const { executionReport, transactionReceipt } = trade
@@ -71,24 +73,43 @@ function amountWithCommission(amount, commissionAsset, side) {
   return side == 'SELL' ? new Decimal(amount).times(commissionAsset == "BNB" ? 0.99925 : 0.999) : new Decimal(amount).times(commissionAsset == "BNB" ? 1.00075 : 1.001)
 }
 
-function getPeriodTimestampRange(period) {
 
-  const formatString = 'yyyy-MM-dd';
-  const backupDate = new Date();
 
-  let range = [new Date(), new Date()];
+function getPeriodTimestampRange(req) {
+  let { period } = req.query
+  const daySeconds = 86400;
+  let dateNowTimestamp = Date.now();
+  let defaultRange = [dateNowTimestamp - (daySeconds * 1000), dateNowTimestamp];
+  if (!period) return defaultRange
+  let periodAsArray = period.split(',')
+  let first = periodAsArray[0]
+  let last = periodAsArray[1]
+  first = first.split('-')
+  last = last.split('-')
+  const fromTimestamp = new Date(first[0], first[1] - 1, first[2]).getTime();
+  const toTimestamp = new Date(last[0], last[1] - 1, last[2]).getTime();
+  return [fromTimestamp, toTimestamp];
+}
 
-  let parsedPeriod = parse(period, formatString, backupDate);
-  let parsedFromDate = parse(period.split(',')[0], formatString, backupDate);
-  var parsedToDate = parse(period.split(',')[1], formatString, backupDate);
 
-  if (isValid(parsedPeriod)) {
-    range[0] = new Date(parsedPeriod);
-    range[1] = new Date(parsedPeriod);
-  } else if (isValid(parsedFromDate) && isValid(parsedToDate)) {
-    range[0] = new Date(parsedFromDate);
-    range[1] = new Date(parsedToDate);
-  };
-
-  return [startOfDay(range[0]).getTime(), endOfDay(range[1]).getTime()];
-};
+/*function getPeriodTimestampRange(period) {
+  const daySeconds = 86400;
+  let dateNowTimestamp = Date.now();
+  let defaultRange = [dateNowTimestamp - (daySeconds * 1000), dateNowTimestamp];
+  console.log(period);
+  if (!period) { console.log('nda'); return defaultRange };
+  let splitedPeriod = period.split(",");
+  if (splitedPeriod.length == 2) {
+    let from = splitedPeriod[0];
+    let to = splitedPeriod[1];
+    if (!(isDate(from) && isDate(to))) return defaultRange;
+    let fromAsTimestamp = toDate(parseISO(from)).getTime();
+    let toAsTimestamp = toDate(parseISO(to)).getTime();
+    return [fromAsTimestamp, toAsTimestamp];
+  } else if (!splitedPeriod.length && isDate(period)) {
+    let fromAsTimestamp = toDate(parseISO(period)).getTime();
+    return [fromAsTimestamp, dateNowTimestamp];
+  } else {
+    return defaultRange;
+  }
+}*/
