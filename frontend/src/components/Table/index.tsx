@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Stack,
   Table,
   Thead,
   Tbody,
@@ -8,7 +7,6 @@ import {
   Th,
   Td,
   TableContainer,
-  Center,
   Button,
   HStack,
   Input,
@@ -158,7 +156,7 @@ function ListOfTrades() {
                     <Td>{trade.tradeId}</Td>
                     <Td>{timeConverter(trade.eventTime)}</Td>
                     <Td>{trade.symbol}</Td>
-                    <Td color={trade.side == "BUY" ? "green" : "red"}>
+                    <Td color={trade.side === "BUY" ? "green" : "red"}>
                       {trade.side}
                     </Td>
                     <Td>
@@ -167,7 +165,7 @@ function ListOfTrades() {
                     <Td>{trade.price}</Td>
                     <Td>{`${trade.commission} (${trade.commissionAsset})`}</Td>
                     <Td>
-                      {currency == "(ETH)-USD"
+                      {currency === "(ETH)-USD"
                         ? `${Number(trade.profit || 0).toFixed(6)} ETH`
                         : `${((trade.profit || 0) * ethereumPrice).toFixed(
                             2
@@ -181,7 +179,7 @@ function ListOfTrades() {
           </Table>
         </TableContainer>
         <HStack alignSelf="center">
-          <Button onClick={prevPage} isDisabled={page == 0 ? true : false}>
+          <Button onClick={prevPage} isDisabled={page === 0 ? true : false}>
             <ArrowLeftIcon color="#277BC0" />
           </Button>
           <Input
@@ -195,7 +193,7 @@ function ListOfTrades() {
           <Button
             onClick={nextPage}
             isDisabled={
-              page + 1 == Math.ceil(trades.length / pageSize) &&
+              page + 1 === Math.ceil(trades.length / pageSize) &&
               Math.ceil(trades.length / pageSize) >= 1
                 ? true
                 : false
