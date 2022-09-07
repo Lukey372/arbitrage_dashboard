@@ -12,9 +12,8 @@ import {
   Input,
   Flex,
   VStack,
-  Text,
 } from "@chakra-ui/react";
-import { ArrowLeftIcon, ArrowRightIcon ,WarningTwoIcon} from "@chakra-ui/icons";
+import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import DateInput from "./dateInput";
 import { isAfter, lightFormat } from "date-fns";
 
@@ -90,7 +89,6 @@ function ListOfTrades() {
   const [pageData, setPageData] = useState<Trade[]>([]);
 
   const [currency, setCurrency] = useState("(ETH)-USD");
-
   const [ethereumPrice, setEthereumPrice] = useState(0);
 
   const nextPage = () => setPage((prev) => prev + 1);
@@ -120,14 +118,7 @@ function ListOfTrades() {
       setTrades(data);
     });
   }, [dateFrom, dateTo]);
-if(pageData.length==0) return(
-<Flex h="100vh" verticalAlign="center"direction="column">
-    <VStack>
-        <WarningTwoIcon/>
-        <Text>there was an error fetching data</Text>
-    </VStack>
-</Flex>
-)
+
   return (
     <Flex
       minHeight="100vh"
@@ -135,7 +126,7 @@ if(pageData.length==0) return(
       alignItems="center"
       justifyContent="center"
     >
-      <VStack width="80%" alignSelf="start" alignItems="start">
+      <VStack width="70%" alignSelf="start" alignItems="start">
         <DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} />
         <TableContainer bg="white" opacity="0.9" borderRadius="2%" w="auto">
           <Table>
