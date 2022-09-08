@@ -4,12 +4,15 @@ const Decimal = require('decimal.js');
 const { mongoClient } = require('../constants');
 const { parse, isValid, startOfDay, endOfDay } = require('date-fns');
 const router = Router();
+let sum = 0
 
 router.get('/trades', async (req, res) => {
+  sum = 0
   const { period } = req.query;
   let [fromTimestamp, toTimestamp] = getPeriodTimestampRange(period);
   let documents = await mongoClient.db("arbitrage").collection("trades").find({ "executionReport.eventTime": { $gte: fromTimestamp, $lte: toTimestamp } }).toArray();
   let trades = documents.map(trade => formatTrade(trade));
+  console.log(sum)
   res.json({ trades });
 });
 
@@ -26,7 +29,8 @@ function formatTrade(trade) {
     let amountOut = new Decimal(value).dividedBy(10 ** 18)
     let amountIn = lastQuoteTransacted
     let profit = side == 'SELL' ? amountWithCommission(amountIn, commissionAsset, side).minus(amountOut) : amountOut.minus(amountWithCommission(amountIn, commissionAsset, side));
-
+    sum = sum + Number(profit)
+    
     return {
       orderId,
       tradeId,
@@ -44,6 +48,7 @@ function formatTrade(trade) {
       profit,
       transactionHash,
       status,
+      sum,
     }
   } else {
     return {
@@ -63,6 +68,7 @@ function formatTrade(trade) {
       profit: 0,
       transactionHash,
       status,
+      sum,
     }
   }
 }

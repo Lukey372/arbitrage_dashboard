@@ -29,7 +29,7 @@ function App() {
   
   return (
 <Layout>
-      {page == "calculator" ? <Home /> :
+      {page == "calculator" ? <Calculator /> :
     <Table/>
       }
       <Button onClick={pageSwitch}>{page == "calculator" ? "Page" : "Calculator"}</Button>

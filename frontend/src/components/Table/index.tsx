@@ -12,6 +12,9 @@ import {
   Input,
   Flex,
   VStack,
+  Spacer,
+  Box,
+  Grid,
 } from "@chakra-ui/react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import DateInput from "./dateInput";
@@ -34,6 +37,7 @@ interface Trade {
   orderId: string;
   transactionHash: string;
   status: boolean;
+  sum: number;
 }
 
 const roninExplorerUrl = `https://explorer.roninchain.com/`;
@@ -90,6 +94,7 @@ function ListOfTrades() {
 
   const [currency, setCurrency] = useState("(ETH)-USD");
   const [ethereumPrice, setEthereumPrice] = useState(0);
+  const [sum, setSum] = useState(0);
 
   const nextPage = () => setPage((prev) => prev + 1);
   const prevPage = () => setPage((prev) => (prev > 0 ? prev - 1 : prev));
@@ -97,6 +102,7 @@ function ListOfTrades() {
   function handleCurrency() {
     setCurrency(currency === "(ETH)-USD" ? "(USD)-ETH" : "(ETH)-USD");
   }
+
   const [dateFrom, setDateFrom] = useState(
     lightFormat(new Date(), "yyyy-MM-dd")
   );
@@ -105,6 +111,8 @@ function ListOfTrades() {
   useEffect(() => {
     setPageData(trades.slice(page * pageSize, page * pageSize + pageSize));
   }, [page, trades]);
+
+
 
   useEffect(() => {
     getEthPrice().then((data) => {
@@ -118,16 +126,29 @@ function ListOfTrades() {
       setTrades(data);
     });
   }, [dateFrom, dateTo]);
+  useEffect(() => {
+    trades.forEach(item => { setSum(item.sum) });
+
+  }, [trades]);
+
 
   return (
     <Flex
       minHeight="100vh"
+      width={"100%"}
       direction="column"
       alignItems="center"
       justifyContent="center"
     >
-      <VStack width="70%" alignSelf="start" alignItems="start">
-        <DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} />
+      <VStack width="50%" height={"100%"} alignSelf="start" alignItems="start" margin={"1rem"}>
+        <Grid  templateColumns='repeat(2, 1fr)' gap={6} justifyContent="space-evenly">
+          <DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} />
+          <HStack  color={"white"} >
+            <Box>The total gain on the selected period is </Box>
+            <Box fontWeight={"bold"}>{(sum * ethereumPrice).toFixed(2)}</Box>
+            <Box> USD</Box>
+          </HStack>
+        </Grid>
         <TableContainer bg="white" opacity="0.9" borderRadius="2%" w="auto">
           <Table>
             <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
@@ -146,6 +167,7 @@ function ListOfTrades() {
             </Thead>
             <Tbody>
               {pageData.map((trade) => {
+
                 return (
                   <Tr _hover={{ bg: "gray.100" }}>
                     {/*<Link  _hover={{ textDecoration: 'none' }} href={explorerLink+trade.transactionHash} isExternal> */}
@@ -168,8 +190,8 @@ function ListOfTrades() {
                       {currency === "(ETH)-USD"
                         ? `${Number(trade.profit || 0).toFixed(6)} ETH`
                         : `${((trade.profit || 0) * ethereumPrice).toFixed(
-                            2
-                          )} USD`}
+                          2
+                        )} USD`}
                     </Td>
                     {/*  </Link> */}
                   </Tr>
@@ -194,7 +216,7 @@ function ListOfTrades() {
             onClick={nextPage}
             isDisabled={
               page + 1 === Math.ceil(trades.length / pageSize) &&
-              Math.ceil(trades.length / pageSize) >= 1
+                Math.ceil(trades.length / pageSize) >= 1
                 ? true
                 : false
             }
