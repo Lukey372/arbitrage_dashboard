@@ -96,7 +96,7 @@ function ListOfTrades() {
   const [currency, setCurrency] = useState("(ETH)-USD");
   const [ethereumPrice, setEthereumPrice] = useState(0);
   const [sum, setSum] = useState(0);
-  const [details, setDetails] = useState(true)
+  const [details, setDetails] = useState(false)
 
   const nextPage = () => setPage((prev) => prev + 1);
   const prevPage = () => setPage((prev) => (prev > 0 ? prev - 1 : prev));
@@ -162,7 +162,7 @@ function ListOfTrades() {
             <Button width="fit-content" marginLeft='12'onClick={handleTable}>{details ? "Less Details" : "More Details"}</Button>
           </GridItem>
         </Grid>
-        <TableContainer bg="white" opacity="0.9" borderRadius="2%" minW="100%">
+        <TableContainer bg="white" opacity="0.9" borderRadius="2%" minW="100%" minH="575px" >
           <Table>
             <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
               <Tr>
