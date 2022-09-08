@@ -15,6 +15,7 @@ import {
   Spacer,
   Box,
   Grid,
+  GridItem,
 } from "@chakra-ui/react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import DateInput from "./dateInput";
@@ -95,6 +96,7 @@ function ListOfTrades() {
   const [currency, setCurrency] = useState("(ETH)-USD");
   const [ethereumPrice, setEthereumPrice] = useState(0);
   const [sum, setSum] = useState(0);
+  const [details, setDetails] = useState(true)
 
   const nextPage = () => setPage((prev) => prev + 1);
   const prevPage = () => setPage((prev) => (prev > 0 ? prev - 1 : prev));
@@ -112,7 +114,9 @@ function ListOfTrades() {
     setPageData(trades.slice(page * pageSize, page * pageSize + pageSize));
   }, [page, trades]);
 
-
+  const handleTable = () => {
+    setDetails(!details)
+  }
 
   useEffect(() => {
     getEthPrice().then((data) => {
@@ -140,22 +144,33 @@ function ListOfTrades() {
       alignItems="center"
       justifyContent="center"
     >
-      <VStack width="50%" height={"100%"} alignSelf="start" alignItems="start" margin={"1rem"}>
-        <Grid  templateColumns='repeat(2, 1fr)' gap={6} justifyContent="space-evenly">
-          <DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} />
-          <HStack  color={"white"} >
-            <Box>The total gain on the selected period is </Box>
-            <Box fontWeight={"bold"}>{(sum * ethereumPrice).toFixed(2)}</Box>
-            <Box> USD</Box>
-          </HStack>
+      <VStack minW="50%" maxW="50%" height={"100%"} alignSelf="start" alignItems="start" margin={"1rem"}>
+        <Grid templateColumns='repeat(3, 1fr)' gap={6} >
+          <GridItem  ><DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} /></GridItem>
+          <GridItem >
+            <Box
+              color='white'
+              overflow="hidden"
+              whiteSpace="nowrap"
+              justifyContent="center"
+              alignItems="center"
+              padding="10px">
+              The total gain on the selected period is : {(sum * ethereumPrice).toFixed(2)} USD
+            </Box>
+          </GridItem>
+          <GridItem >
+            <Button width="fit-content" marginLeft='12'onClick={handleTable}>{details ? "Less Details" : "More Details"}</Button>
+          </GridItem>
         </Grid>
-        <TableContainer bg="white" opacity="0.9" borderRadius="2%" w="auto">
+        <TableContainer bg="white" opacity="0.9" borderRadius="2%" minW="100%">
           <Table>
             <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
               <Tr>
-                <Th>Status</Th>
-                <Th>Order Id</Th>
-                <Th>Trade Id</Th>
+                {details ? <Flex>
+                  <Th>Status</Th>
+                  <Th>Order Id</Th>
+                  <Th>Trade Id</Th></Flex> : null}
+
                 <Th>Time</Th>
                 <Th>Pair</Th>
                 <Th>Side</Th>
@@ -171,11 +186,13 @@ function ListOfTrades() {
                 return (
                   <Tr _hover={{ bg: "gray.100" }}>
                     {/*<Link  _hover={{ textDecoration: 'none' }} href={explorerLink+trade.transactionHash} isExternal> */}
-                    <Td color={trade.status ? "green" : "red"}>
+                    {details ? <Flex><Td color={trade.status ? "green" : "red"}>
                       {trade.status ? "Success" : "Failure"}
                     </Td>
-                    <Td>{trade.orderId}</Td>
-                    <Td>{trade.tradeId}</Td>
+                      <Td>{trade.orderId}</Td>
+                      <Td>{trade.tradeId}</Td></Flex> : null}
+
+
                     <Td>{timeConverter(trade.eventTime)}</Td>
                     <Td>{trade.symbol}</Td>
                     <Td color={trade.side === "BUY" ? "green" : "red"}>
