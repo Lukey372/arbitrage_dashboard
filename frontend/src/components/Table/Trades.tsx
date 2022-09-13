@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, HStack, Input, Flex, VStack, Box, Grid, GridItem } from "@chakra-ui/react";
-import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, HStack, Input, Flex, VStack, Box, Grid, GridItem, Checkbox, CheckboxGroup, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
+import { ArrowLeftIcon, ArrowRightIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { isAfter, lightFormat } from "date-fns";
 import DateInput from "./dateInput";
 
@@ -67,6 +67,8 @@ async function getTrades(dateFrom: string, dateTo: string) {
 }
 
 
+
+
 export default function TradeTable() {
     const pageSize = 10;
 
@@ -75,8 +77,6 @@ export default function TradeTable() {
     const [sum, setSum] = useState(0);
 
     const [ethereumPrice, setEthereumPrice] = useState(0);
-
-    const [details, setDetails] = useState(false)
 
     const [trades, setTrades] = useState<Trade[]>([]);
 
@@ -88,13 +88,21 @@ export default function TradeTable() {
 
     const [dateTo, setDateTo] = useState(lightFormat(new Date(), "yyyy-MM-dd"));
 
+    const [isStatus, setIsStatus] = useState(false);
+    const [isOrderId, setIsOrderId] = useState(false);
+    const [isTradeId, setIsTradeId] = useState(false);
+    const [isTime, setIsTime] = useState(true);
+    const [isPair, setIsPair] = useState(true);
+    const [isSide, setIsSide] = useState(true);
+    const [isQuantity, setIsQuantity] = useState(true);
+    const [isPrice, setIsPrice] = useState(true);
+    const [isCommission, setIsCommission] = useState(true);
+    const [isProfit, setIsProfit] = useState(true);
+
     const nextPage = () => setPage((prev) => prev + 1);
 
     const prevPage = () => setPage((prev) => (prev > 0 ? prev - 1 : prev));
 
-    const handleTable = () => { setDetails(!details) }
-
-    function handleCurrency() { setCurrency(currency === "(ETH)-USD" ? "(USD)-ETH" : "(ETH)-USD"); }
 
 
     useEffect(() => {
@@ -123,6 +131,32 @@ export default function TradeTable() {
 
     }, [trades]);
 
+
+    function handleCurrency() { setCurrency(currency === "(ETH)-USD" ? "(USD)-ETH" : "(ETH)-USD"); }
+    
+
+    function CheckBOX() {
+        return (
+            <Menu closeOnSelect={false}>
+                <MenuButton marginLeft={20} as={Button} rightIcon={<ChevronDownIcon />}>
+                    Filter
+                </MenuButton>
+                <MenuList>
+                    <MenuItem><Checkbox isChecked={isStatus?true:false} onChange={()=>{setIsStatus(!isStatus)}}>Status</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isOrderId?true:false}onChange={()=>{setIsOrderId(!isOrderId)}}>Order Id</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isTradeId?true:false}onChange={()=>{setIsTradeId(!isTradeId)}}>Trade Id</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isTime?true:false}onChange={()=>{setIsTime(!isTime)}} >Time</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isPair?true:false}onChange={()=>{setIsPair(!isPair)}} >Pair</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isSide?true:false}onChange={()=>{setIsSide(!isSide)}} >Side</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isQuantity?true:false}onChange={()=>{setIsQuantity(!isQuantity)}} >Quantity</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isPrice?true:false}onChange={()=>{setIsPrice(!isPrice)}} >Price</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isCommission?true:false}onChange={()=>{setIsCommission(!isCommission)}} >Commission</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isProfit?true:false}onChange={()=>{setIsProfit(!isProfit)}} >Profit</Checkbox></MenuItem>
+                </MenuList>
+            </Menu>
+        )
+    }
+
     return (
 
         <VStack minW="50%" maxW="50%" height={"100%"} alignSelf="start" alignItems="start" margin={"1rem"}>
@@ -140,58 +174,42 @@ export default function TradeTable() {
                     </Box>
                 </GridItem>
                 <GridItem >
-                    <Button width="fit-content" marginLeft='12' onClick={handleTable}>{details ? "Less Details" : "More Details"}</Button>
+                    
+                    <CheckBOX />
                 </GridItem>
             </Grid>
             <TableContainer bg="white" opacity="0.9" borderRadius="10px" minW="100%" minH="575px" >
                 <Table>
                     <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
                         <Tr>
-                            {details ? <Flex>
-                                <Th>Status</Th>
-                                <Th>Order Id</Th>
-                                <Th>Trade Id</Th></Flex> : null}
-
-                            <Th>Time</Th>
-                            <Th>Pair</Th>
-                            <Th>Side</Th>
-                            <Th>Quantity</Th>
-                            <Th>Price</Th>
-                            <Th>Commission</Th>
-                            <Th onClick={handleCurrency}>Profit {currency}</Th>
+                            {isStatus ? <Th>Status</Th> : null}
+                            {isOrderId ? <Th>Order Id</Th> : null}
+                            {isTradeId ? <Th>Trade Id</Th> : null}
+                            {isTime ? <Th>Time</Th> : null}
+                            {isPair ? <Th>Pair</Th> : null}
+                            {isSide ? <Th>Side</Th> : null}
+                            {isQuantity ? <Th>Quantity</Th> : null}
+                            {isPrice ? <Th>Price</Th> : null}
+                            {isCommission ? <Th>Commission</Th> : null}
+                            {isProfit ? <Th onClick={handleCurrency}>Profit {currency}</Th> : null}
                         </Tr>
                     </Thead>
                     <Tbody>
+
                         {pageData.map((trade) => {
 
                             return (
                                 <Tr _hover={{ bg: "gray.100" }}>
-                                    {/*<Link  _hover={{ textDecoration: 'none' }} href={explorerLink+trade.transactionHash} isExternal> */}
-                                    {details ? <Flex><Td color={trade.status ? "green" : "red"}>
-                                        {trade.status ? "Success" : "Failure"}
-                                    </Td>
-                                        <Td>{trade.orderId}</Td>
-                                        <Td>{trade.tradeId}</Td></Flex> : null}
-
-
-                                    <Td>{timeConverter(trade.eventTime)}</Td>
-                                    <Td>{trade.symbol}</Td>
-                                    <Td color={trade.side === "BUY" ? "green" : "red"}>
-                                        {trade.side}
-                                    </Td>
-                                    <Td>
-                                        {Number(trade.lastTradeQuantity).toFixed(0) + " SLP"}
-                                    </Td>
-                                    <Td>{trade.price}</Td>
-                                    <Td>{`${trade.commission} (${trade.commissionAsset})`}</Td>
-                                    <Td>
-                                        {currency === "(ETH)-USD"
-                                            ? `${Number(trade.profit || 0).toFixed(6)} ETH`
-                                            : `${((trade.profit || 0) * ethereumPrice).toFixed(
-                                                2
-                                            )} USD`}
-                                    </Td>
-                                    {/*  </Link> */}
+                                    {isStatus ? <Td color={trade.status ? "green" : "red"}>{trade.status ? "Success" : "Failure"}</Td> : null}
+                                    {isOrderId ? <Td>{trade.orderId}</Td> : null}
+                                    {isTradeId ? <Td>{trade.tradeId}</Td> : null}
+                                    {isTime ? <Td>{timeConverter(trade.eventTime)}</Td> : null}
+                                    {isPair ? <Td>{trade.symbol}</Td> : null}
+                                    {isSide ? <Td color={trade.side === "BUY" ? "green" : "red"}>{trade.side}</Td> : null}
+                                    {isQuantity ? <Td>{Number(trade.lastTradeQuantity).toFixed(0) + " SLP"}</Td> : null}
+                                    {isPrice ? <Td>{trade.price}</Td> : null}
+                                    {isCommission ? <Td>{`${trade.commission} (${trade.commissionAsset})`}</Td> : null}
+                                    {isProfit ? <Td>{currency === "(ETH)-USD" ? `${Number(trade.profit || 0).toFixed(6)} ETH` : `${((trade.profit || 0) * ethereumPrice).toFixed(2)} USD`}</Td> : null}
                                 </Tr>
                             );
                         })}
