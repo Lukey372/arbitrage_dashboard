@@ -12,7 +12,6 @@ router.get('/trades', async (req, res) => {
   let [fromTimestamp, toTimestamp] = getPeriodTimestampRange(period);
   let documents = await mongoClient.db("arbitrage").collection("trades").find({ "executionReport.eventTime": { $gte: fromTimestamp, $lte: toTimestamp } }).toArray();
   let trades = documents.map(trade => formatTrade(trade));
-  console.log(sum)
   res.json({ trades });
 });
 
