@@ -4,35 +4,38 @@ import Chart from "react-apexcharts";
 
 
 
-const  options = {
-    chart: {
-        id: "basic-bar"
-    },
-    xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+
+
+export default function DataChart(props: {
+    trades: any[];
+    setTrades: any;
+    timeConverter:any
+  }) {
+    const { trades,timeConverter } = props;
+    const options = {
+        colors: ["#FF1654"],
+       
     }
-}
 
-const series = [
-    {
-        name: "series-1",
-        data: [30, 40, 45, 50, 49, 60, 70, 91]
-    }
-]
-
-
-export default function DataChart(){
-    return(
+   
+    let tab:any = []
+    trades.map((trade) => {tab.push((trade.profit*1700).toFixed(2))})
+    console.log(tab)
+    let series = [
+        {
+            data: tab
+        }
+    ]
+    return (
 
         <Chart
             options={options}
             series={series}
-            type="bar"
             width="100%"
             height="100%"
         />
 
-);
+    );
 }
 
 

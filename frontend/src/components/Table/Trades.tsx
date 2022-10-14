@@ -30,29 +30,6 @@ const coingeckoApiUrl = "https://api.coingecko.com/api/v3/coins/markets?vs_curre
 
 const tradesApiUrl = "http://127.0.0.1:5000/api/trades";
 
-function timeConverter(UNIX_timestamp: number) {
-    var a = new Date(UNIX_timestamp);
-    var months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-    ];
-    var month = months[a.getMonth()];
-    var date = a.getDate() < 10 ? "0" + a.getDate() : a.getDate();
-    var hour = a.getHours() < 10 ? "0" + a.getHours() : a.getHours();
-    var min = a.getMinutes() < 10 ? "0" + a.getMinutes() : a.getMinutes();
-    var time = `${date}-${month} | ${hour}:${min}`;
-    return time;
-}
 
 async function getEthPrice() {
     let response = await fetch(coingeckoApiUrl);
@@ -69,7 +46,12 @@ async function getTrades(dateFrom: string, dateTo: string) {
 
 
 
-export default function TradeTable() {
+export default function TradeTable(props: {
+    trades: any[];
+    setTrades: any;
+    timeConverter:any
+  }) {
+    const { trades, setTrades ,timeConverter} = props;
     const pageSize = 10;
 
     const [page, setPage] = useState(0);
@@ -78,7 +60,6 @@ export default function TradeTable() {
 
     const [ethereumPrice, setEthereumPrice] = useState(0);
 
-    const [trades, setTrades] = useState<Trade[]>([]);
 
     const [pageData, setPageData] = useState<Trade[]>([]);
 
@@ -170,7 +151,7 @@ export default function TradeTable() {
                         justifyContent="center"
                         alignItems="center"
                         padding="10px">
-                        The total gain on the selected period is : {(sum * ethereumPrice).toFixed(2)} USD
+                        The total gain on the selected period is : {currency === "(ETH)-USD" ?(sum).toFixed(6)+" ETH":(sum * ethereumPrice).toFixed(2)+" USD"} 
                     </Box>
                 </GridItem>
                 <GridItem >
