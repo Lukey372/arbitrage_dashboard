@@ -70,7 +70,7 @@ export default function GettingStarted() {
         textAlign={'center'}
         align={'center'}
         spacing={{ base: 8, md: 10 }}
-        py={{ base: 20, md: 28 }}>
+        py={{ base: 10, md: 28 }}>
         <Heading
           fontWeight={1000}
           fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }}
@@ -86,7 +86,7 @@ export default function GettingStarted() {
           with this intuitive plateform equiped with most sophisticeted
           statistics to help you manage your portfolio
         </Text>
-        <Stack spacing={6} direction={'row'}>
+        <Stack spacing={1} direction={'row'}>
           <AlertMsg />
           <Button rounded={'full'} px={6} onClick={login}>
             Connect Wallet
@@ -94,8 +94,8 @@ export default function GettingStarted() {
         </Stack>
         <Flex w={'full'}>
           <Illustration
-            height={{ sm: '23rem', lg: '26rem' }}
-            mt={{ base: 20, sm: 2 }}
+            height={ '26rem' }
+            mt={'20rem'}
           />
         </Flex>
       </Stack>

@@ -14,7 +14,7 @@ function Drawerex() {
 
     return (
         <>
-            <Button ref={btnRef} bg="#277BC0" color="white" size='lg' marginRight="4" marginTop="4" _hover={{ bg: "#014882" }} onClick={onOpen}>
+            <Button ref={btnRef} bg="#277BC0" color="white" size={{base:"sm",sm:"md",md:"lg"}}  marginRight="4" marginTop="4" marginLeft="4" _hover={{ bg: "#014882" }} onClick={onOpen}>
                 <HamburgerIcon w="8" h="8" />
             </Button>
             <Drawer isOpen={isOpen} placement='right' onClose={onClose} finalFocusRef={btnRef} >

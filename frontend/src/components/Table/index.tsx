@@ -1,7 +1,7 @@
 import { useState } from "react";
 import TradesTable from "./Trades";
 import TradeConfig from "./tradeConfig";
-import { Flex, HStack } from "@chakra-ui/react";
+import { Flex, Stack } from "@chakra-ui/react";
 
 
 interface Trade {
@@ -62,10 +62,11 @@ function ListOfTrades() {
       alignItems="center"
       justifyContent="center"
     >
-      <HStack width={"100%"}>
+      
+      <Stack width={"100%"} direction={{base:"column",sm:"column",md:"column",lg:"row"}}>
         <TradesTable {...{ trades, setTrades, timeConverter }} />
         <TradeConfig {...{ trades, setTrades, timeConverter }} />
-      </HStack>
+      </Stack>
     </Flex>
   );
 }

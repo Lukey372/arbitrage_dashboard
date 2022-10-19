@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, HStack, Input, Flex, VStack, Box, Grid, GridItem, Checkbox, CheckboxGroup, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, HStack, Input, Flex, VStack, Stack, Box, Grid, GridItem, Checkbox, CheckboxGroup, Menu, MenuButton, MenuList, MenuItem, Spacer } from "@chakra-ui/react";
 import { ArrowLeftIcon, ArrowRightIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { isAfter, lightFormat } from "date-fns";
 import DateInput from "./dateInput";
@@ -49,9 +49,9 @@ async function getTrades(dateFrom: string, dateTo: string) {
 export default function TradeTable(props: {
     trades: any[];
     setTrades: any;
-    timeConverter:any
-  }) {
-    const { trades, setTrades ,timeConverter} = props;
+    timeConverter: any
+}) {
+    const { trades, setTrades, timeConverter } = props;
     const pageSize = 10;
 
     const [page, setPage] = useState(0);
@@ -114,25 +114,25 @@ export default function TradeTable(props: {
 
 
     function handleCurrency() { setCurrency(currency === "(ETH)-USD" ? "(USD)-ETH" : "(ETH)-USD"); }
-    
+
 
     function CheckBOX() {
         return (
             <Menu closeOnSelect={false}>
-                <MenuButton marginLeft={20} as={Button} rightIcon={<ChevronDownIcon />}>
+                <MenuButton marginLeft={"50%"} as={Button} rightIcon={<ChevronDownIcon />}>
                     Filter
                 </MenuButton>
                 <MenuList>
-                    <MenuItem><Checkbox isChecked={isStatus?true:false} onChange={()=>{setIsStatus(!isStatus)}}>Status</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isOrderId?true:false}onChange={()=>{setIsOrderId(!isOrderId)}}>Order Id</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isTradeId?true:false}onChange={()=>{setIsTradeId(!isTradeId)}}>Trade Id</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isTime?true:false}onChange={()=>{setIsTime(!isTime)}} >Time</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isPair?true:false}onChange={()=>{setIsPair(!isPair)}} >Pair</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isSide?true:false}onChange={()=>{setIsSide(!isSide)}} >Side</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isQuantity?true:false}onChange={()=>{setIsQuantity(!isQuantity)}} >Quantity</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isPrice?true:false}onChange={()=>{setIsPrice(!isPrice)}} >Price</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isCommission?true:false}onChange={()=>{setIsCommission(!isCommission)}} >Commission</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isProfit?true:false}onChange={()=>{setIsProfit(!isProfit)}} >Profit</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isStatus ? true : false} onChange={() => { setIsStatus(!isStatus) }}>Status</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isOrderId ? true : false} onChange={() => { setIsOrderId(!isOrderId) }}>Order Id</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isTradeId ? true : false} onChange={() => { setIsTradeId(!isTradeId) }}>Trade Id</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isTime ? true : false} onChange={() => { setIsTime(!isTime) }} >Time</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isPair ? true : false} onChange={() => { setIsPair(!isPair) }} >Pair</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isSide ? true : false} onChange={() => { setIsSide(!isSide) }} >Side</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isQuantity ? true : false} onChange={() => { setIsQuantity(!isQuantity) }} >Quantity</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isPrice ? true : false} onChange={() => { setIsPrice(!isPrice) }} >Price</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isCommission ? true : false} onChange={() => { setIsCommission(!isCommission) }} >Commission</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isProfit ? true : false} onChange={() => { setIsProfit(!isProfit) }} >Profit</Checkbox></MenuItem>
                 </MenuList>
             </Menu>
         )
@@ -140,25 +140,21 @@ export default function TradeTable(props: {
 
     return (
 
-        <VStack minW="50%" maxW="50%" height={"100%"} alignSelf="start" alignItems="start" margin={"1rem"}>
-            <Grid templateColumns='repeat(3, 1fr)' gap={6} >
-                <GridItem  ><DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} /></GridItem>
-                <GridItem >
-                    <Box
-                        color='white'
-                        overflow="hidden"
-                        whiteSpace="nowrap"
-                        justifyContent="center"
-                        alignItems="center"
-                        padding="10px">
-                        The total gain on the selected period is : {currency === "(ETH)-USD" ?(sum).toFixed(6)+" ETH":(sum * ethereumPrice).toFixed(2)+" USD"} 
-                    </Box>
-                </GridItem>
-                <GridItem >
+        <Stack minW={{base:"100%",sm:"100%",md:"100%", lg:"50%"}} maxW={{base:"100%",sm:"100%",md:"100%",lg:"100%", xl:"50%"}} height={"100%"} alignSelf="start" alignItems="start" paddingLeft="1rem" paddingRight="1rem" direction={"column"}>
+            <Stack direction={"row"} maxW='100%' minW="100%" alignItems="center">
+                <Stack direction={{base:"column",sm:"column",md:"column" ,lg:"column",xl:"row"}}>
+                <DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} />
+                <Box
+                    color='white'
                     
-                    <CheckBOX />
-                </GridItem>
-            </Grid>
+                    justifyContent="center"
+                    alignItems="center"
+                    padding="10px">
+                    The total gain on the selected period is : {currency === "(ETH)-USD" ? (sum).toFixed(6) + " ETH" : (sum * ethereumPrice).toFixed(2) + " USD"}
+                </Box>
+                </Stack>
+                <CheckBOX />
+            </Stack>
             <TableContainer bg="white" opacity="0.9" borderRadius="10px" minW="100%" minH="575px" >
                 <Table>
                     <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
@@ -221,6 +217,6 @@ export default function TradeTable(props: {
                     <ArrowRightIcon color="#277BC0" />
                 </Button>
             </HStack>
-        </VStack>
+        </Stack>
     )
 }

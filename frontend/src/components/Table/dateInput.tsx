@@ -23,7 +23,7 @@ export default function DateInput(props: {
     <Stack
       width="fit-content"
       gap="0.1rem"
-      direction={{ sm: "column", md: "row", lg: "row" }}
+      direction={{ base:"column",sm: "row", md: "row", lg: "row" }}
     >
       <Input
         placeholder="Select Date and Time"
