@@ -20,7 +20,7 @@ export default function DataChart(props: {
    
     let tab:any = []
     trades.map((trade) => {tab.push((trade.profit*1700).toFixed(2))})
-    console.log(tab)
+    
     let series = [
         {
             data: tab

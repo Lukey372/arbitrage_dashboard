@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, HStack, Input, Flex, VStack, Stack, Box, Grid, GridItem, Checkbox, CheckboxGroup, Menu, MenuButton, MenuList, MenuItem, Spacer } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, HStack, Input, Stack, Box, Checkbox,  Menu, MenuButton, MenuList, MenuItem, Tooltip } from "@chakra-ui/react";
 import { ArrowLeftIcon, ArrowRightIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { isAfter, lightFormat } from "date-fns";
 import DateInput from "./dateInput";
@@ -60,6 +60,7 @@ export default function TradeTable(props: {
 
     const [ethereumPrice, setEthereumPrice] = useState(0);
 
+    const [orderIdFilter, setOrderIdFilter] = useState(false);
 
     const [pageData, setPageData] = useState<Trade[]>([]);
 
@@ -70,10 +71,10 @@ export default function TradeTable(props: {
     const [dateTo, setDateTo] = useState(lightFormat(new Date(), "yyyy-MM-dd"));
 
     const [isStatus, setIsStatus] = useState(false);
-    const [isOrderId, setIsOrderId] = useState(false);
+    const [isOrderId, setIsOrderId] = useState(true);
     const [isTradeId, setIsTradeId] = useState(false);
     const [isTime, setIsTime] = useState(true);
-    const [isPair, setIsPair] = useState(true);
+    const [isPair, setIsPair] = useState(false);
     const [isSide, setIsSide] = useState(true);
     const [isQuantity, setIsQuantity] = useState(true);
     const [isPrice, setIsPrice] = useState(true);
@@ -102,9 +103,9 @@ export default function TradeTable(props: {
     useEffect(() => {
         if (isAfter(new Date(dateFrom), new Date(dateTo))) return;
         getTrades(dateFrom, dateTo).then((data) => {
-            setTrades(data);
+            orderIdFilter ?  setTrades(orderIdTrades(data)) : setTrades(data)
         });
-    }, [dateFrom, dateTo]);
+    }, [dateFrom, dateTo,orderIdFilter]);
 
 
     useEffect(() => {
@@ -114,6 +115,32 @@ export default function TradeTable(props: {
 
 
     function handleCurrency() { setCurrency(currency === "(ETH)-USD" ? "(USD)-ETH" : "(ETH)-USD"); }
+
+    function orderIdTrades(props: any[]) {
+        let temporaryTable = [];
+        let finalTable = [];
+        let [lastOrderId, profits, quantities] = [0, 0, 0];
+
+        for (const item of props) {
+            if ((item.orderId == lastOrderId || temporaryTable.length == 0) && item.tradeId != props[props.length - 1].tradeId) { temporaryTable.push(item); lastOrderId = item.orderId }
+            else {
+                if (item.tradeId == props[props.length - 1].tradeId) { temporaryTable.push(item) }
+                for (const subItem of temporaryTable) {
+                    profits = profits + Number(subItem.profit)
+                    quantities = quantities + Number(subItem.lastTradeQuantity)
+                }
+                finalTable.push(temporaryTable[0])
+                finalTable[finalTable.length - 1].quantity = quantities
+                finalTable[finalTable.length - 1].profit = profits
+                profits = 0
+                quantities = 0
+                temporaryTable = []
+                temporaryTable.push(item)
+                lastOrderId = item.orderId
+            }
+        }
+        return finalTable
+    }
 
 
     function CheckBOX() {
@@ -140,18 +167,18 @@ export default function TradeTable(props: {
 
     return (
 
-        <Stack minW={{base:"100%",sm:"100%",md:"100%", lg:"50%"}} maxW={{base:"100%",sm:"100%",md:"100%",lg:"100%", xl:"50%"}} height={"100%"} alignSelf="start" alignItems="start" paddingLeft="1rem" paddingRight="1rem" direction={"column"}>
+        <Stack minW={{ base: "100%", sm: "100%", md: "100%", lg: "50%" }} maxW={{ base: "100%", sm: "100%", md: "100%", lg: "100%", xl: "50%" }} height={"100%"} alignSelf="start" alignItems="start" paddingLeft="1rem" paddingRight="1rem" direction={"column"}>
             <Stack direction={"row"} maxW='100%' minW="100%" alignItems="center">
-                <Stack direction={{base:"column",sm:"column",md:"column" ,lg:"column",xl:"row"}}>
-                <DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} />
-                <Box
-                    color='white'
-                    
-                    justifyContent="center"
-                    alignItems="center"
-                    padding="10px">
-                    The total gain on the selected period is : {currency === "(ETH)-USD" ? (sum).toFixed(6) + " ETH" : (sum * ethereumPrice).toFixed(2) + " USD"}
-                </Box>
+                <Stack direction={{ base: "column", sm: "column", md: "column", lg: "column", xl: "row" }}>
+                    <DateInput {...{ dateFrom, setDateFrom, dateTo, setDateTo }} />
+                    <Box
+                        color='white'
+
+                        justifyContent="center"
+                        alignItems="center"
+                        padding="10px">
+                        The total gain on the selected period is : {currency === "(ETH)-USD" ? (sum).toFixed(6) + " ETH" : (sum * ethereumPrice).toFixed(2) + " USD"}
+                    </Box>
                 </Stack>
                 <CheckBOX />
             </Stack>
@@ -160,7 +187,7 @@ export default function TradeTable(props: {
                     <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
                         <Tr>
                             {isStatus ? <Th>Status</Th> : null}
-                            {isOrderId ? <Th>Order Id</Th> : null}
+                            {isOrderId ? <Th onClick={()=>{setOrderIdFilter(!orderIdFilter)}}><Tooltip label='Click to Filter by OrderId' bg="white">Order Id</Tooltip></Th> : null}
                             {isTradeId ? <Th>Trade Id</Th> : null}
                             {isTime ? <Th>Time</Th> : null}
                             {isPair ? <Th>Pair</Th> : null}
