@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, Skeleton, HStack, Input, Stack, Box, Checkbox, Menu, MenuButton, MenuList, MenuItem, Tooltip } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, Skeleton, HStack, Input, Stack, Box, Checkbox, Menu, MenuButton, MenuList, MenuItem, Tooltip, VStack } from "@chakra-ui/react";
 import { ArrowLeftIcon, ArrowRightIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { isAfter, lightFormat } from "date-fns";
 import DateInput from "./dateInput";
+import { time } from "console";
 
 interface Trade {
     tradeId: string;
@@ -21,6 +22,7 @@ interface Trade {
     orderId: string;
     transactionHash: string;
     status: boolean;
+    additionalInfos: any;
 };
 
 const roninExplorerUrl = `https://explorer.roninchain.com/`;
@@ -135,12 +137,19 @@ export default function TradeTable(props: {
                 finalTable.push(temporaryTable[0])
                 finalTable[finalTable.length - 1].quantity = quantities
                 finalTable[finalTable.length - 1].profit = profits
+                finalTable[finalTable.length - 1].additionalInfos = {
+                    tradeCount: temporaryTable.length,
+                    firstTradeTime: temporaryTable[0].eventTime,
+                    lastTradeTime: temporaryTable[temporaryTable.length - 1].eventTime
+                }
+
                 profits = 0
                 quantities = 0
                 temporaryTable = []
                 temporaryTable.push(item)
                 lastOrderId = item.orderId
             }
+
         }
         return finalTable
     }
@@ -190,7 +199,7 @@ export default function TradeTable(props: {
                     <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
                         <Tr>
                             {isStatus ? <Th>Status</Th> : null}
-                            {isOrderId ? <Th onClick={() => { setOrderIdFilter(!orderIdFilter) }}><Tooltip label='Click to Filter by OrderId' bg="white">Order Id</Tooltip></Th> : null}
+                            {isOrderId ? <Th onClick={() => { setOrderIdFilter(!orderIdFilter) }}><Tooltip label='Click to Filter by OrderId' bg="white" borderRadius="8">Order Id</Tooltip></Th> : null}
                             {isTradeId ? <Th>Trade Id</Th> : null}
                             {isTime ? <Th>Time</Th> : null}
                             {isPair ? <Th>Pair</Th> : null}
@@ -198,17 +207,26 @@ export default function TradeTable(props: {
                             {isQuantity ? <Th>Quantity</Th> : null}
                             {isPrice ? <Th>Price</Th> : null}
                             {isCommission ? <Th>Commission</Th> : null}
-                            {isProfit ? <Th onClick={handleCurrency}>Profit {currency}</Th> : null}
+                            {isProfit ? <Th onClick={handleCurrency}><Tooltip label="Click to Swap Currencies" bg="white" borderRadius="8"><Box>Profit {currency}</Box></Tooltip></Th> : null}
                         </Tr>
                     </Thead>
                     <Tbody>
 
                         {pageData.map((trade) => {
-
                             return (
                                 <Tr _hover={{ bg: "gray.100" }}>
                                     {isStatus ? <Td color={trade.status ? "green" : "red"}>{trade.status ? "Success" : "Failure"}</Td> : null}
-                                    {isOrderId ? <Td><Skeleton isLoaded={isLoaded}>{trade.orderId}</Skeleton></Td> : null}
+                                    {isOrderId ? <Td><Skeleton isLoaded={isLoaded}>
+                                        {orderIdFilter && trade.additionalInfos != null ?
+                                            <Tooltip label={
+                                                <VStack>
+                                                    <Box>Total Number of Trades : {trade.additionalInfos.tradeCount}</Box>
+                                                    <Box>First Trade Time : {timeConverter(trade.additionalInfos.firstTradeTime)}</Box>
+                                                    <Box>Last Trade Time : {timeConverter(trade.additionalInfos.lastTradeTime)}</Box>
+                                                </VStack>
+                                            } bg='white' borderRadius="8">
+                                                <Box>{trade.orderId}</Box></Tooltip> : <Box> {trade.orderId}</Box>}
+                                    </Skeleton></Td> : null}
                                     {isTradeId ? <Td><Skeleton isLoaded={isLoaded}>{trade.tradeId}</Skeleton></Td> : null}
                                     {isTime ? <Td><Skeleton isLoaded={isLoaded}>{timeConverter(trade.eventTime)}</Skeleton></Td> : null}
                                     {isPair ? <Td><Skeleton isLoaded={isLoaded}>{trade.symbol}</Skeleton></Td> : null}

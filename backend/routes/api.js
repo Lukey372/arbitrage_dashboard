@@ -27,6 +27,7 @@ function formatTrade(trade) {
     let amountIn = lastQuoteTransacted
     let profit = side == 'SELL' ? amountWithCommission(amountIn, commissionAsset, side).minus(amountOut) : amountOut.minus(amountWithCommission(amountIn, commissionAsset, side));
     
+    
     return {
       orderId,
       tradeId,
@@ -44,6 +45,7 @@ function formatTrade(trade) {
       profit,
       transactionHash,
       status,
+      
     }
   } else {
     return {
@@ -63,6 +65,7 @@ function formatTrade(trade) {
       profit: 0,
       transactionHash,
       status,
+      
     }
   }
 }
