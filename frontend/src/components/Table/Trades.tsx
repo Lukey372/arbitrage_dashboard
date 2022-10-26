@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, HStack, Input, Stack, Box, Checkbox,  Menu, MenuButton, MenuList, MenuItem, Tooltip } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, Skeleton, HStack, Input, Stack, Box, Checkbox, Menu, MenuButton, MenuList, MenuItem, Tooltip } from "@chakra-ui/react";
 import { ArrowLeftIcon, ArrowRightIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { isAfter, lightFormat } from "date-fns";
 import DateInput from "./dateInput";
@@ -79,6 +79,7 @@ export default function TradeTable(props: {
     const [isPrice, setIsPrice] = useState(true);
     const [isCommission, setIsCommission] = useState(true);
     const [isProfit, setIsProfit] = useState(true);
+    const [isLoaded, setIsLoaded] = useState(true)
 
     const nextPage = () => setPage((prev) => prev + 1);
 
@@ -101,15 +102,17 @@ export default function TradeTable(props: {
 
     useEffect(() => {
         if (isAfter(new Date(dateFrom), new Date(dateTo))) return;
+        setIsLoaded(false);
         getTrades(dateFrom, dateTo).then((data) => {
-            orderIdFilter ?  setTrades(orderIdTrades(data)) : setTrades(data)
+            setIsLoaded(true);
+            orderIdFilter ? setTrades(orderIdTrades(data)) : setTrades(data);
         });
-    }, [dateFrom, dateTo,orderIdFilter]);
+    }, [dateFrom, dateTo, orderIdFilter]);
 
 
     useEffect(() => {
         let totalProfit = 0
-        trades.forEach(item => { totalProfit = totalProfit + Number(item.profit)});
+        trades.forEach(item => { totalProfit = totalProfit + Number(item.profit) });
         setSum(totalProfit);
     }, [trades]);
 
@@ -187,7 +190,7 @@ export default function TradeTable(props: {
                     <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
                         <Tr>
                             {isStatus ? <Th>Status</Th> : null}
-                            {isOrderId ? <Th onClick={()=>{setOrderIdFilter(!orderIdFilter)}}><Tooltip label='Click to Filter by OrderId' bg="white">Order Id</Tooltip></Th> : null}
+                            {isOrderId ? <Th onClick={() => { setOrderIdFilter(!orderIdFilter) }}><Tooltip label='Click to Filter by OrderId' bg="white">Order Id</Tooltip></Th> : null}
                             {isTradeId ? <Th>Trade Id</Th> : null}
                             {isTime ? <Th>Time</Th> : null}
                             {isPair ? <Th>Pair</Th> : null}
@@ -205,15 +208,15 @@ export default function TradeTable(props: {
                             return (
                                 <Tr _hover={{ bg: "gray.100" }}>
                                     {isStatus ? <Td color={trade.status ? "green" : "red"}>{trade.status ? "Success" : "Failure"}</Td> : null}
-                                    {isOrderId ? <Td>{trade.orderId}</Td> : null}
-                                    {isTradeId ? <Td>{trade.tradeId}</Td> : null}
-                                    {isTime ? <Td>{timeConverter(trade.eventTime)}</Td> : null}
-                                    {isPair ? <Td>{trade.symbol}</Td> : null}
-                                    {isSide ? <Td color={trade.side === "BUY" ? "green" : "red"}>{trade.side}</Td> : null}
-                                    {isQuantity ? <Td>{Number(trade.lastTradeQuantity).toFixed(0) + " SLP"}</Td> : null}
-                                    {isPrice ? <Td>{trade.price}</Td> : null}
-                                    {isCommission ? <Td>{`${trade.commission} (${trade.commissionAsset})`}</Td> : null}
-                                    {isProfit ? <Td>{currency === "(ETH)-USD" ? `${Number(trade.profit || 0).toFixed(6)} ETH` : `${((trade.profit || 0) * ethereumPrice).toFixed(2)} USD`}</Td> : null}
+                                    {isOrderId ? <Td><Skeleton isLoaded={isLoaded}>{trade.orderId}</Skeleton></Td> : null}
+                                    {isTradeId ? <Td><Skeleton isLoaded={isLoaded}>{trade.tradeId}</Skeleton></Td> : null}
+                                    {isTime ? <Td><Skeleton isLoaded={isLoaded}>{timeConverter(trade.eventTime)}</Skeleton></Td> : null}
+                                    {isPair ? <Td><Skeleton isLoaded={isLoaded}>{trade.symbol}</Skeleton></Td> : null}
+                                    {isSide ? <Td color={trade.side === "BUY" ? "green" : "red"}><Skeleton isLoaded={isLoaded}>{trade.side}</Skeleton></Td> : null}
+                                    {isQuantity ? <Td><Skeleton isLoaded={isLoaded}>{Number(trade.lastTradeQuantity).toFixed(0) + " SLP"}</Skeleton></Td> : null}
+                                    {isPrice ? <Td><Skeleton isLoaded={isLoaded}>{trade.price}</Skeleton></Td> : null}
+                                    {isCommission ? <Td><Skeleton isLoaded={isLoaded}>{`${trade.commission} (${trade.commissionAsset})`}</Skeleton></Td> : null}
+                                    {isProfit ? <Td><Skeleton isLoaded={isLoaded}>{currency === "(ETH)-USD" ? `${Number(trade.profit || 0).toFixed(6)} ETH` : `${((trade.profit || 0) * ethereumPrice).toFixed(2)} USD`}</Skeleton></Td> : null}
                                 </Tr>
                             );
                         })}
