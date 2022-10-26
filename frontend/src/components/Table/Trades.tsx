@@ -21,7 +21,6 @@ interface Trade {
     orderId: string;
     transactionHash: string;
     status: boolean;
-    sum: number;
 };
 
 const roninExplorerUrl = `https://explorer.roninchain.com/`;
@@ -109,8 +108,9 @@ export default function TradeTable(props: {
 
 
     useEffect(() => {
-        trades.forEach(item => { setSum(item.sum) });
-
+        let totalProfit = 0
+        trades.forEach(item => { totalProfit = totalProfit + Number(item.profit)});
+        setSum(totalProfit);
     }, [trades]);
 
 
