@@ -80,6 +80,7 @@ export default function TradeTable(props: {
     const [isQuantity, setIsQuantity] = useState(true);
     const [isPrice, setIsPrice] = useState(true);
     const [isCommission, setIsCommission] = useState(true);
+    const [isGas, setIsGas] = useState(false);
     const [isProfit, setIsProfit] = useState(true);
     const [isLoaded, setIsLoaded] = useState(true)
 
@@ -124,7 +125,7 @@ export default function TradeTable(props: {
     function orderIdTrades(props: any[]) {
         let temporaryTable = [];
         let finalTable = [];
-        let [lastOrderId, profits, quantities] = [0, 0, 0];
+        let [lastOrderId, profits, quantities,gases] = [0, 0, 0,0];
 
         for (const item of props) {
             if ((item.orderId == lastOrderId || temporaryTable.length == 0) && item.tradeId != props[props.length - 1].tradeId) { temporaryTable.push(item); lastOrderId = item.orderId }
@@ -133,10 +134,13 @@ export default function TradeTable(props: {
                 for (const subItem of temporaryTable) {
                     profits = profits + Number(subItem.profit)
                     quantities = quantities + Number(subItem.lastTradeQuantity)
+                    gases = gases + Number(subItem.gasUsed)*Number(subItem.effectiveGasPrice)/(10**18)
+                    
                 }
                 finalTable.push(temporaryTable[0])
                 finalTable[finalTable.length - 1].quantity = quantities
                 finalTable[finalTable.length - 1].profit = profits
+                finalTable[finalTable.length - 1].gasUsed = gases
                 finalTable[finalTable.length - 1].additionalInfos = {
                     tradeCount: temporaryTable.length,
                     firstTradeTime: temporaryTable[0].eventTime,
@@ -145,12 +149,14 @@ export default function TradeTable(props: {
 
                 profits = 0
                 quantities = 0
+                gases = 0
                 temporaryTable = []
                 temporaryTable.push(item)
                 lastOrderId = item.orderId
             }
 
         }
+        
         return finalTable
     }
 
@@ -171,12 +177,12 @@ export default function TradeTable(props: {
                     <MenuItem><Checkbox isChecked={isQuantity ? true : false} onChange={() => { setIsQuantity(!isQuantity) }} >Quantity</Checkbox></MenuItem>
                     <MenuItem><Checkbox isChecked={isPrice ? true : false} onChange={() => { setIsPrice(!isPrice) }} >Price</Checkbox></MenuItem>
                     <MenuItem><Checkbox isChecked={isCommission ? true : false} onChange={() => { setIsCommission(!isCommission) }} >Commission</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isGas ? true : false} onChange={() => { setIsGas(!isGas) }} >Gas</Checkbox></MenuItem>
                     <MenuItem><Checkbox isChecked={isProfit ? true : false} onChange={() => { setIsProfit(!isProfit) }} >Profit</Checkbox></MenuItem>
                 </MenuList>
             </Menu>
         )
     }
-
     return (
 
         <Stack minW={{ base: "100%", sm: "100%", md: "100%", lg: "50%" }} maxW={{ base: "100%", sm: "100%", md: "100%", lg: "100%", xl: "50%" }} height={"100%"} alignSelf="start" alignItems="start" paddingLeft="1rem" paddingRight="1rem" direction={"column"}>
@@ -207,6 +213,7 @@ export default function TradeTable(props: {
                             {isQuantity ? <Th>Quantity</Th> : null}
                             {isPrice ? <Th>Price</Th> : null}
                             {isCommission ? <Th>Commission</Th> : null}
+                            {isGas ? <Th>Gas Fees</Th> : null}
                             {isProfit ? <Th onClick={handleCurrency}><Tooltip label="Click to Swap Currencies" bg="white" borderRadius="8"><Box>Profit {currency}</Box></Tooltip></Th> : null}
                         </Tr>
                     </Thead>
@@ -234,6 +241,7 @@ export default function TradeTable(props: {
                                     {isQuantity ? <Td><Skeleton isLoaded={isLoaded}>{Number(trade.lastTradeQuantity).toFixed(0) + " SLP"}</Skeleton></Td> : null}
                                     {isPrice ? <Td><Skeleton isLoaded={isLoaded}>{trade.price}</Skeleton></Td> : null}
                                     {isCommission ? <Td><Skeleton isLoaded={isLoaded}>{`${trade.commission} (${trade.commissionAsset})`}</Skeleton></Td> : null}
+                                    {isGas ? <Td><Skeleton isLoaded={isLoaded}>{orderIdFilter?Number(trade.gasUsed).toFixed(4):(Number(trade.gasUsed)*Number(trade.effectiveGasPrice)/(10**18)).toFixed(4)} { "(RON)"}</Skeleton></Td> : null}
                                     {isProfit ? <Td><Skeleton isLoaded={isLoaded}>{currency === "(ETH)-USD" ? `${Number(trade.profit || 0).toFixed(6)} ETH` : `${((trade.profit || 0) * ethereumPrice).toFixed(2)} USD`}</Skeleton></Td> : null}
                                 </Tr>
                             );
