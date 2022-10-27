@@ -268,8 +268,8 @@ export default function TradeTable(props: {
                 <Button
                     onClick={nextPage}
                     isDisabled={
-                        page + 1 === Math.ceil(trades.length / pageSize) &&
-                            Math.ceil(trades.length / pageSize) >= 1
+                        (page + 1 === Math.ceil(trades.length / pageSize) &&
+                            Math.ceil(trades.length / pageSize) >= 1) || Math.ceil(trades.length / pageSize)==0
                             ? true
                             : false
                     }
