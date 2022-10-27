@@ -125,7 +125,7 @@ export default function TradeTable(props: {
     function orderIdTrades(props: any[]) {
         let temporaryTable = [];
         let finalTable = [];
-        let [lastOrderId, profits, quantities,gases] = [0, 0, 0,0];
+        let [lastOrderId, profits, quantities, gases, commissions] = [0, 0, 0, 0, 0];
 
         for (const item of props) {
             if ((item.orderId == lastOrderId || temporaryTable.length == 0) && item.tradeId != props[props.length - 1].tradeId) { temporaryTable.push(item); lastOrderId = item.orderId }
@@ -134,13 +134,15 @@ export default function TradeTable(props: {
                 for (const subItem of temporaryTable) {
                     profits = profits + Number(subItem.profit)
                     quantities = quantities + Number(subItem.lastTradeQuantity)
-                    gases = gases + Number(subItem.gasUsed)*Number(subItem.effectiveGasPrice)/(10**18)
-                    
+                    gases = gases + Number(subItem.gasUsed) * Number(subItem.effectiveGasPrice) / (10 ** 18)
+                    commissions = commissions + Number(subItem.commission)
+
                 }
                 finalTable.push(temporaryTable[0])
                 finalTable[finalTable.length - 1].quantity = quantities
                 finalTable[finalTable.length - 1].profit = profits
                 finalTable[finalTable.length - 1].gasUsed = gases
+                finalTable[finalTable.length - 1].commission = commissions
                 finalTable[finalTable.length - 1].additionalInfos = {
                     tradeCount: temporaryTable.length,
                     firstTradeTime: temporaryTable[0].eventTime,
@@ -150,13 +152,14 @@ export default function TradeTable(props: {
                 profits = 0
                 quantities = 0
                 gases = 0
+                commissions = 0
                 temporaryTable = []
                 temporaryTable.push(item)
                 lastOrderId = item.orderId
             }
 
         }
-        
+
         return finalTable
     }
 
@@ -240,8 +243,8 @@ export default function TradeTable(props: {
                                     {isSide ? <Td color={trade.side === "BUY" ? "green" : "red"}><Skeleton isLoaded={isLoaded}>{trade.side}</Skeleton></Td> : null}
                                     {isQuantity ? <Td><Skeleton isLoaded={isLoaded}>{Number(trade.lastTradeQuantity).toFixed(0) + " SLP"}</Skeleton></Td> : null}
                                     {isPrice ? <Td><Skeleton isLoaded={isLoaded}>{trade.price}</Skeleton></Td> : null}
-                                    {isCommission ? <Td><Skeleton isLoaded={isLoaded}>{`${trade.commission} (${trade.commissionAsset})`}</Skeleton></Td> : null}
-                                    {isGas ? <Td><Skeleton isLoaded={isLoaded}>{orderIdFilter?Number(trade.gasUsed).toFixed(4):(Number(trade.gasUsed)*Number(trade.effectiveGasPrice)/(10**18)).toFixed(4)} { "(RON)"}</Skeleton></Td> : null}
+                                    {isCommission ? <Td><Skeleton isLoaded={isLoaded}>{`${Number(trade.commission).toFixed(6)} (${trade.commissionAsset})`}</Skeleton></Td> : null}
+                                    {isGas ? <Td><Skeleton isLoaded={isLoaded}>{orderIdFilter ? Number(trade.gasUsed).toFixed(4) : (Number(trade.gasUsed) * Number(trade.effectiveGasPrice) / (10 ** 18)).toFixed(4)} {"(RON)"}</Skeleton></Td> : null}
                                     {isProfit ? <Td><Skeleton isLoaded={isLoaded}>{currency === "(ETH)-USD" ? `${Number(trade.profit || 0).toFixed(6)} ETH` : `${((trade.profit || 0) * ethereumPrice).toFixed(2)} USD`}</Skeleton></Td> : null}
                                 </Tr>
                             );
