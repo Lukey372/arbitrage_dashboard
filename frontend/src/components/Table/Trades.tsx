@@ -107,6 +107,7 @@ export default function TradeTable(props: {
         if (isAfter(new Date(dateFrom), new Date(dateTo))) return;
         setIsLoaded(false);
         getTrades(dateFrom, dateTo).then((data) => {
+            setPage(0);
             setIsLoaded(true);
             orderIdFilter ? setTrades(orderIdTrades(data)) : setTrades(data);
         });
@@ -180,7 +181,7 @@ export default function TradeTable(props: {
                     <MenuItem><Checkbox isChecked={isQuantity ? true : false} onChange={() => { setIsQuantity(!isQuantity) }} >Quantity</Checkbox></MenuItem>
                     <MenuItem><Checkbox isChecked={isPrice ? true : false} onChange={() => { setIsPrice(!isPrice) }} >Price</Checkbox></MenuItem>
                     <MenuItem><Checkbox isChecked={isCommission ? true : false} onChange={() => { setIsCommission(!isCommission) }} >Commission</Checkbox></MenuItem>
-                    <MenuItem><Checkbox isChecked={isGas ? true : false} onChange={() => { setIsGas(!isGas) }} >Gas</Checkbox></MenuItem>
+                    <MenuItem><Checkbox isChecked={isGas ? true : false} onChange={() => { setIsGas(!isGas) }} >Gas Fees</Checkbox></MenuItem>
                     <MenuItem><Checkbox isChecked={isProfit ? true : false} onChange={() => { setIsProfit(!isProfit) }} >Profit</Checkbox></MenuItem>
                 </MenuList>
             </Menu>
