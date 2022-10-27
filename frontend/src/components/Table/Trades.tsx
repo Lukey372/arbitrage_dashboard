@@ -140,7 +140,7 @@ export default function TradeTable(props: {
 
                 }
                 finalTable.push(temporaryTable[0])
-                finalTable[finalTable.length - 1].quantity = quantities
+                finalTable[finalTable.length - 1].lastTradeQuantity = quantities
                 finalTable[finalTable.length - 1].profit = profits
                 finalTable[finalTable.length - 1].gasUsed = gases
                 finalTable[finalTable.length - 1].commission = commissions
@@ -187,6 +187,7 @@ export default function TradeTable(props: {
             </Menu>
         )
     }
+    console.log(trades)
     return (
 
         <Stack minW={{ base: "100%", sm: "100%", md: "100%", lg: "50%" }} maxW={{ base: "100%", sm: "100%", md: "100%", lg: "100%", xl: "50%" }} height={"100%"} alignSelf="start" alignItems="start" paddingLeft="1rem" paddingRight="1rem" direction={"column"}>
