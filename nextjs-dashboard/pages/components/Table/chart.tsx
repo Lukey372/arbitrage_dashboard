@@ -9,9 +9,10 @@ import Chart from "react-apexcharts";
 export default function DataChart(props: {
     trades: any[];
     setTrades: any;
-    timeConverter:any
+    timeConverter:any;
+    ethereumPrice:any
   }) {
-    const { trades,timeConverter } = props;
+    const { trades,timeConverter,ethereumPrice } = props;
     const options = {
         colors: ["#FF1654"],
        
@@ -19,7 +20,7 @@ export default function DataChart(props: {
 
    
     let tab:any = []
-    trades.map((trade) => {tab.push((trade.profit*1700).toFixed(2))})
+    trades.map((trade) => {tab.push((trade.profit*ethereumPrice).toFixed(2))})
     
     let series = [
         {

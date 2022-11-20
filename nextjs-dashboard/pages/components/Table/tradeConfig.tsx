@@ -32,7 +32,7 @@ export default function TradeConfig(props: {
     return (
         <VStack w={"100%"} padding="1rem" paddingTop={{ lg: "12%", xl: "5%", "2xl": "3%" }}>
             <HStack maxH={"400px"} w={"100%"}>
-                <Box bg="white" borderRadius={"10px"} minW="60%" maxW="60%" minH={"400px"} maxH={"400px"}></Box>
+                <Box bg="white" borderRadius={"10px"} minW="60%" maxW="60%" minH={"400px"} maxH={"400px"}><DataChart {...{ trades, setTrades,timeConverter,ethereumPrice }} /></Box>
                 <Box bg="white" borderRadius={"10px"} minW="39%" maxW="39%" minH={"400px"} maxH={"400px"}><TradeParams /></Box>
             </HStack>
             <Flex bg="white" minW="100%" maxW="100%" minH={"170px"} maxH={"170px"} borderRadius={"10px"} alignSelf="start">

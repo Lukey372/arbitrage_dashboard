@@ -16,7 +16,7 @@ const breakpoints = {
 export default function TradeConfig(props: {
     trades: any[];
     setTrades: any;
-    timeConverter: any
+    timeConverter: any 
 }) {
     const { trades, setTrades, timeConverter } = props;
     return (
