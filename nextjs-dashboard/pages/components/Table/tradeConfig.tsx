@@ -37,21 +37,21 @@ export default function TradeConfig(props: {
             </HStack>
             <Flex bg="white" minW="100%" maxW="100%" minH={"170px"} maxH={"170px"} borderRadius={"10px"} alignSelf="start">
                 <VStack justifyContent={"center"} align="flex-start" marginLeft={5}>
-                    <Box fontWeight= "500" _hover={{ color: "grey" }}>The volume is : {numeral(volume).format('0,0')} SLP</Box>
-                    <Box fontWeight= "500"_hover={{ color: "grey" }}>The Total Gas is : {numeral(totalGasFee.toFixed(2)).format('0,0.000')} RON</Box>
-                    <Box fontWeight= "500"_hover={{ color: "grey" }}>The Total profit is : {numeral(sum.toFixed(6)).format('0,0.0000')} ETH</Box>
+                    <Box fontWeight= "500" _hover={{ color: "grey" }}>Volume  : {numeral(volume).format('0,0')} SLP</Box>
+                    <Box fontWeight= "500"_hover={{ color: "grey" }}>Gas Fee : {numeral(totalGasFee.toFixed(2)).format('0,0.000')} RON</Box>
+                    <Box fontWeight= "500"_hover={{ color: "grey" }}>Profit  : {numeral(sum.toFixed(6)).format('0,0.0000')} ETH</Box>
                 </VStack>
                 <Spacer/>
                 <VStack justifyContent={"center"} align="flex-start" >
-                    <Box fontWeight= "500"_hover={{ color: "grey" }}>The Slp price is : {numeral(slpPrice.toFixed(6)).format('0,0.00000')} USD</Box>
-                    <Box fontWeight= "500"_hover={{ color: "grey" }}>The Ron price is : {numeral(ronPrice).format('0,0.0000')} USD</Box>
-                    <Box fontWeight= "500"_hover={{ color: "grey" }}>The Eth price is : {numeral(ethereumPrice).format('0,0.00')} USD</Box>
+                    <Box fontWeight= "500"_hover={{ color: "grey" }}>Slp price : {numeral(slpPrice.toFixed(6)).format('0,0.00000')} USD</Box>
+                    <Box fontWeight= "500"_hover={{ color: "grey" }}>Ron price : {numeral(ronPrice).format('0,0.0000')} USD</Box>
+                    <Box fontWeight= "500"_hover={{ color: "grey" }}>Eth price : {numeral(ethereumPrice).format('0,0.00')} USD</Box>
                 </VStack>
                 <Spacer/>
                 <VStack justifyContent={"center"} align="flex-start" marginRight={5}>
-                    <Box fontWeight= "500"_hover={{ color: "grey" }}>The volume is : {numeral((volume*slpPrice).toFixed(2)).format('0,0.00')} USD</Box>
-                    <Box fontWeight= "500"_hover={{ color: "grey" }}>The Total Gas is : {numeral((totalGasFee*ronPrice).toFixed(2)).format('0,0.00')} USD</Box>
-                    <Box fontWeight= "500"_hover={{ color: "grey" }}>The Total profit is : {numeral((sum*ethereumPrice).toFixed(2)).format('0,0.00')} USD</Box>
+                    <Box fontWeight= "500"_hover={{ color: "grey" }}>Volume : {numeral((volume*slpPrice).toFixed(2)).format('0,0.00')} USD</Box>
+                    <Box fontWeight= "500"_hover={{ color: "grey" }}>Gas Fee : {numeral((totalGasFee*ronPrice).toFixed(2)).format('0,0.00')} USD</Box>
+                    <Box fontWeight= "500"_hover={{ color: "grey" }}>Profit : {numeral((sum*ethereumPrice).toFixed(2)).format('0,0.00')} USD</Box>
                 </VStack>
             </Flex>
         </VStack>
