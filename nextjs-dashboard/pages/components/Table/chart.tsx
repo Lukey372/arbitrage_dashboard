@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import Chart from "react-apexcharts";
+import dynamic from 'next/dynamic';
+const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 
 
@@ -27,16 +29,16 @@ export default function DataChart(props: {
             data: tab
         }
     ]
-    return (
-
-        <Chart
+     if (typeof window !== "undefined") {
+        return(
+            <ApexCharts
             options={options}
             series={series}
             width="100%"
             height="100%"
         />
-
-    );
+        )
+      };
 }
 
 
