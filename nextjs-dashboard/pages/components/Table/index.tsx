@@ -28,7 +28,12 @@ interface Trade {
 function ListOfTrades() {
 
   const [trades, setTrades] = useState<Trade[]>([]);
-
+  const [volume, setVolume] = useState(0)
+  const [totalGasFee, setTotalGasFee] = useState(0)
+  const [ethereumPrice, setEthereumPrice] = useState(0);
+  const [sum, setSum] = useState(0);
+  const [slpPrice, setSlpPrice] = useState(0)
+  const [ronPrice, setRonPrice] = useState(0)
   function timeConverter(UNIX_timestamp: number) {
     var a = new Date(UNIX_timestamp);
     var months = [
@@ -62,10 +67,10 @@ function ListOfTrades() {
       alignItems="center"
       justifyContent="center"
     >
-      
-      <Stack width={"100%"} direction={{base:"column",sm:"column",md:"column",lg:"row"}}>
-        <TradesTable {...{ trades, setTrades, timeConverter }} />
-        <TradeConfig {...{ trades, setTrades, timeConverter }} />
+
+      <Stack width={"100%"} direction={{ base: "column", sm: "column", md: "column", lg: "row" }}>
+        <TradesTable {...{ trades, setTrades, timeConverter, volume, setVolume, totalGasFee, setTotalGasFee, ethereumPrice, setEthereumPrice, sum, setSum, slpPrice, setSlpPrice, ronPrice, setRonPrice }} />
+        <TradeConfig {...{ trades, setTrades, timeConverter, volume, setVolume, totalGasFee, setTotalGasFee, ethereumPrice, setEthereumPrice, sum, setSum, slpPrice, setSlpPrice, ronPrice, setRonPrice }} />
       </Stack>
     </Flex>
   );

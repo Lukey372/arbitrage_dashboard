@@ -27,15 +27,23 @@ interface Trade {
 
 const roninExplorerUrl = `https://explorer.roninchain.com/`;
 
-const coingeckoApiUrl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=100&page=1&sparkline=false";
+const ethPriceApi = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=100&page=1&sparkline=false";
+const slpPriceApi = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=smooth-love-potion&order=market_cap_desc&per_page=100&page=1&sparkline=false";
+const ronPriceApi = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ronin&order=market_cap_desc&per_page=100&page=1&sparkline=false";
 
 const tradesApiUrl = "/api/trades";
 
 
-async function getEthPrice() {
-    let response = await fetch(coingeckoApiUrl);
-    let responseJson = await response.json();
-    return responseJson[0].current_price;
+async function getCoinPrices() {
+    let ethData = await fetch(ethPriceApi);
+    let ethDataJson = await ethData.json();
+    let slpData = await fetch(slpPriceApi);
+    let slpDataJson = await slpData.json();
+    let ronData = await fetch(ronPriceApi);
+    let ronDataJson = await ronData.json();
+
+    return [ethDataJson[0].current_price,slpDataJson[0].current_price,ronDataJson[0].current_price]
+        
 }
 
 async function getTrades(dateFrom: string, dateTo: string) {
@@ -50,16 +58,26 @@ async function getTrades(dateFrom: string, dateTo: string) {
 export default function TradeTable(props: {
     trades: any[];
     setTrades: any;
-    timeConverter: any
+    timeConverter: any;
+    volume: any;
+    setVolume: any;
+    totalGasFee: any;
+    setTotalGasFee: any;
+    ethereumPrice: any;
+    setEthereumPrice: any;
+    sum : any;
+    setSum : any
+    setSlpPrice:any
+    setRonPrice:any
 }) {
-    const { trades, setTrades, timeConverter } = props;
+    const { trades, setTrades, timeConverter,setVolume,setTotalGasFee,ethereumPrice,setEthereumPrice,sum,setSum,setSlpPrice,setRonPrice } = props;
     const pageSize = 10;
 
     const [page, setPage] = useState(0);
 
-    const [sum, setSum] = useState(0);
+    
 
-    const [ethereumPrice, setEthereumPrice] = useState(0);
+    
 
     const [orderIdFilter, setOrderIdFilter] = useState(false);
 
@@ -97,8 +115,10 @@ export default function TradeTable(props: {
 
 
     useEffect(() => {
-        getEthPrice().then((data) => {
-            setEthereumPrice(data);
+        getCoinPrices().then((data) => {
+            setEthereumPrice(data[0]);
+            setSlpPrice(data[1]);
+            setRonPrice(data[2])
         });
     }, []);
 
@@ -116,8 +136,16 @@ export default function TradeTable(props: {
 
     useEffect(() => {
         let totalProfit = 0
-        trades.forEach(item => { totalProfit = totalProfit + Number(item.profit) });
+        let memVolume = 0
+        let memGasFee = 0
+        trades.forEach(item => {
+            totalProfit = totalProfit + Number(item.profit);
+            memVolume = memVolume + Number(item.lastTradeQuantity);
+            memGasFee = memGasFee + Number(item.effectiveGasPrice)*Number(item.gasUsed)/(10 ** 18)
+        });
         setSum(totalProfit);
+        setVolume(memVolume);
+        setTotalGasFee(memGasFee);
     }, [trades]);
 
 
@@ -210,7 +238,7 @@ export default function TradeTable(props: {
                     <Thead bg="gray.200" _hover={{ bg: "gray.300" }}>
                         <Tr>
                             {isStatus ? <Th>Status</Th> : null}
-                            {isOrderId ? <Th onClick={() => { setOrderIdFilter(!orderIdFilter) }}><Tooltip label='Click to Filter by OrderId' bg="white" borderRadius="8">Order Id</Tooltip></Th> : null}
+                            {isOrderId ? <Th onClick={() => { setOrderIdFilter(!orderIdFilter) }}><Tooltip label='Click to Filter by OrderId' color="black" bg="white" borderRadius="8">Order Id</Tooltip></Th> : null}
                             {isTradeId ? <Th>Trade Id</Th> : null}
                             {isTime ? <Th>Time</Th> : null}
                             {isPair ? <Th>Pair</Th> : null}
@@ -219,7 +247,7 @@ export default function TradeTable(props: {
                             {isPrice ? <Th>Price</Th> : null}
                             {isCommission ? <Th>Commission</Th> : null}
                             {isGas ? <Th>Gas Fees</Th> : null}
-                            {isProfit ? <Th onClick={handleCurrency}><Tooltip label="Click to Swap Currencies" bg="white" borderRadius="8"><Box>Profit {currency}</Box></Tooltip></Th> : null}
+                            {isProfit ? <Th onClick={handleCurrency}><Tooltip label="Click to Swap Currencies" color="black" bg="white" borderRadius="8"><Box>Profit {currency}</Box></Tooltip></Th> : null}
                         </Tr>
                     </Thead>
                     <Tbody>
@@ -236,7 +264,7 @@ export default function TradeTable(props: {
                                                     <Box>First Trade Time : {timeConverter(trade.additionalInfos.firstTradeTime)}</Box>
                                                     <Box>Last Trade Time : {timeConverter(trade.additionalInfos.lastTradeTime)}</Box>
                                                 </VStack>
-                                            } bg='white' borderRadius="8">
+                                            } color="black" bg='white' borderRadius="8">
                                                 <Box>{trade.orderId}</Box></Tooltip> : <Box> {trade.orderId}</Box>}
                                     </Skeleton></Td> : null}
                                     {isTradeId ? <Td><Skeleton isLoaded={isLoaded}>{trade.tradeId}</Skeleton></Td> : null}
@@ -270,7 +298,7 @@ export default function TradeTable(props: {
                     onClick={nextPage}
                     isDisabled={
                         (page + 1 === Math.ceil(trades.length / pageSize) &&
-                            Math.ceil(trades.length / pageSize) >= 1) || Math.ceil(trades.length / pageSize)==0
+                            Math.ceil(trades.length / pageSize) >= 1) || Math.ceil(trades.length / pageSize) == 0
                             ? true
                             : false
                     }
